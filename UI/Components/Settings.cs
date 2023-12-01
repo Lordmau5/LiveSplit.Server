@@ -8,9 +8,13 @@ namespace LiveSplit.UI.Components
 {
     public partial class Settings : UserControl
     {
+        private ServerComponent serverComponent = null;
+
         public ushort Port { get; set; }
 
         public string LocalIP { get; set; }
+
+        public bool AutoStartServer { get; set; }
 
         public string GetIP()
         {
@@ -27,10 +31,14 @@ namespace LiveSplit.UI.Components
             set { Port = ushort.Parse(value); }
         }
 
-        public Settings()
+        public Settings(ServerComponent serverComponent)
         {
             InitializeComponent();
+
+            this.serverComponent = serverComponent;
+
             Port = 16834;
+
             LocalIP = GetIP();
             label3.Text = LocalIP;
 
@@ -51,12 +59,24 @@ namespace LiveSplit.UI.Components
 
         private int CreateSettingsNode(XmlDocument document, XmlElement parent)
         {
-            return SettingsHelper.CreateSetting(document, parent, "Port", PortString);
+            return SettingsHelper.CreateSetting(document, parent, "Port", PortString) ^
+                SettingsHelper.CreateSetting(document, parent, "AutoStartServer", AutoStartServer);
         }
 
         public void SetSettings(XmlNode settings)
         {
             PortString = SettingsHelper.ParseString(settings["Port"]);
+
+            AutoStartServer = SettingsHelper.ParseBool(settings["AutoStartServer"]);
+            checkBoxAutoStart.Checked = AutoStartServer;
+
+            if (AutoStartServer && serverComponent != null && serverComponent.Server == null)
+                serverComponent.Start();
+        }
+
+        private void checkBoxAutoStart_CheckedChanged(object sender, EventArgs e)
+        {
+            AutoStartServer = checkBoxAutoStart.Checked;
         }
     }
 }

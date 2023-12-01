@@ -1,4 +1,4 @@
-﻿using LiveSplit.Model;
+using LiveSplit.Model;
 using LiveSplit.Options;
 using LiveSplit.TimeFormatters;
 using System;
@@ -41,7 +41,7 @@ namespace LiveSplit.UI.Components
 
         public ServerComponent(LiveSplitState state)
         {
-            Settings = new Settings();
+            Settings = new Settings(this);
             Model = new TimerModel();
             Connections = new List<Connection>();
 
@@ -89,6 +89,8 @@ namespace LiveSplit.UI.Components
             Connections.Clear();
             if (Server != null)
                 Server.Stop();
+
+            Server = null;
         }
 
         public void AcceptTcpClient(IAsyncResult result)
